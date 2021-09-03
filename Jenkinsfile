@@ -9,6 +9,8 @@ pipeline {
         ECRREGISTRY = '464599248654.dkr.ecr.us-east-1.amazonaws.com'
         IMAGENAME = 'demomk'
         IMAGE_TAG = 'latest'
+        ECS_CLUSTER = 'marcelcluster'
+        ECS_SERVICE = 'marcelservice'
     }
     stages {
        stage ('Clone') {
@@ -62,7 +64,19 @@ pipeline {
                 sh 'docker push ${ECRREGISTRY}/${IMAGENAME}:${IMAGE_TAG}'
             }
         }                
+       
         
+         stage('update ecs service') {
+            steps {
+                sh 'aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --region ${AWS_REGION} -force-new-deployment true'
+            }
+        }            
+        
+         stage('wait ecs service stable') {
+            steps {
+                sh 'aws ecs wait --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --region ${AWS_REGION}'
+            }
+        }                    
     }
     post {
         always {
