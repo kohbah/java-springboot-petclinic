@@ -68,13 +68,13 @@ pipeline {
         
          stage('update ecs service') {
             steps {
-                sh 'aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment'
+                sh 'aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment --region ${AWS_REGION}'
             }
         }            
         
          stage('wait ecs service stable') {
             steps {
-                sh 'aws ecs wait --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE}'
+                sh 'aws ecs wait --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --region ${AWS_REGION}'
             }
         }                    
     }
