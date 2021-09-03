@@ -74,7 +74,7 @@ pipeline {
         
          stage('wait ecs service stable') {
             steps {
-                sh 'aws ecs wait --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --region ${AWS_REGION}'
+                sh 'aws ecs wait services-stable --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --region ${AWS_REGION}'
             }
         }                    
     }
