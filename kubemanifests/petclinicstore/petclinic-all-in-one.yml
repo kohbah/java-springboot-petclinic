@@ -1,10 +1,4 @@
 ---
- kind: Namespace
- apiVersion: v1
- metadata:
-   name: petclinic
-
----
 apiVersion: v1
 kind: Service
 metadata:
