@@ -1,0 +1,28 @@
+#kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.2/deploy/static/provider/baremetal/deploy.yaml
+#
+#kubectl get pods -n ingress-nginx \
+#  -l app.kubernetes.io/name=ingress-nginx --watch
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: guestbook
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /questbook
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+      - path: /nginx
+        pathType: Prefix
+        backend:
+          service:
+            name: helloservice
+            port:
+              number: 80

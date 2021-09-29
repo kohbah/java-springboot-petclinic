@@ -1,0 +1,85 @@
+---
+ kind: Namespace
+ apiVersion: v1
+ metadata:
+   name: petclinic
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-service
+  namespace: petclinic
+  labels:
+    app: petclinic-app
+    tier: backend
+    role: backend
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: petclinic-app
+    tier: backend
+    role: backend
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-deployment
+  namespace: petclinic
+spec:
+  selector:
+    matchLabels:
+      app: petclinic-app
+      tier: backend
+      role: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: petclinic-app
+        tier: backend
+        role: backend
+    spec:
+      containers:
+      - name: backend
+        image: k8s.gcr.io/redis:e2e
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+        env:
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: petclinic-secrets
+                key: mysqluser
+          - name: MYSQL_PASS
+            valueFrom:
+              secretKeyRef:
+                name: petclinic-secrets
+                key: mysqlpass
+          - name: MYSQL_URL
+            valueFrom:
+              secretKeyRef:
+                name: petclinic-secrets
+                key: mysqlurl
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+  name: backend-app-scale
+  namespace: petclinic
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: petclinic-deployment
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 50

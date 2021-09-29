@@ -1,0 +1,81 @@
+---
+ kind: Namespace
+ apiVersion: v1
+ metadata:
+   name: appservice
+
+---
+ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   name: web-sites
+   namespace: appservice
+ spec:
+  selector:
+    matchLabels:
+      app: web
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: front-end
+        image: nginx:mainline
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      - name: spring-boot
+        image: sonamsamdupkhangsar/springboot-docker:simple
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+          - name: GET_HOSTS_FROM
+            value: dns
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appservice
+  namespace: appservice
+spec:
+  selector:
+    app: web
+  ports:
+    - name: front-end
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30000
+
+    - name: spring-boot
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30001
+  type: NodePort
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+  name: web-sites
+  namespace: appservice
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-sites
+  minReplicas: 4
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
