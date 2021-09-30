@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: petclinic-service
-  namespace: petclinic
+  name: dallasvoting-service
+  namespace: dallasvoting
   labels:
-    app: petclinic-app
+    app: dallasvoting-app
     tier: backend
     role: backend
 spec:
@@ -14,9 +14,9 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 8080
-    nodePort: 30003
+    nodePort: 30001
   selector:
-    app: petclinic-app
+    app: dallasvoting-app
     tier: backend
     role: backend
 
@@ -24,25 +24,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: petclinic-deployment
-  namespace: petclinic
+  name: dallasvoting-deployment
+  namespace: dallasvoting
 spec:
   selector:
     matchLabels:
-      app: petclinic-app
+      app: dallasvoting-app
       tier: backend
       role: backend
   replicas: 1
   template:
     metadata:
       labels:
-        app: petclinic-app
+        app: dallasvoting-app
         tier: backend
         role: backend
     spec:
       containers:
       - name: backend
-        image: kohbah/petclinic:db
+        image: kohbah/dallasvoting:latest
         resources:
           requests:
             cpu: 100m
@@ -50,33 +50,33 @@ spec:
         ports:
         - containerPort: 8080
         env:
-          - name: MYSQL_USER
+          - name: SPRING_DATASOURCE_USERNAME
             valueFrom:
               secretKeyRef:
-                name: petclinic-secrets
-                key: mysqluser
-          - name: MYSQL_PASS
+                name: dallasvoting-secrets
+                key: dbuser
+          - name: SPRING_DATASOURCE_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: petclinic-secrets
-                key: mysqlpass
-          - name: MYSQL_URL
+                name: dallasvoting-secrets
+                key: dbpass
+          - name: SPRING_DATASOURCE_URL
             valueFrom:
               secretKeyRef:
-                name: petclinic-secrets
-                key: mysqlurl
+                name: dallasvoting-secrets
+                key: dburl
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   annotations:
   name: backend-app-scale
-  namespace: petclinic
+  namespace: dallasvoting
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: petclinic-deployment
+    name: dallasvoting-deployment
   minReplicas: 2
   maxReplicas: 4
   targetCPUUtilizationPercentage: 50
