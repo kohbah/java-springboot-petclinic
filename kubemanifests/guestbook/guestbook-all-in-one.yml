@@ -115,7 +115,7 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 80
-    nodePort: 30002
+    nodePort: 30010
   selector:
     app: guestbook
     tier: frontend
