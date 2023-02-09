@@ -1,6 +1,3 @@
-orbs:
-  sonarcloud: sonarsource/sonarcloud@1.1.1
-
 # Use the latest 2.1 version of CircleCI pipeline process engine.
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
@@ -29,13 +26,6 @@ jobs:
       - run:
           name: Test
           command: mvn test
-  jobs:
-  sonarsource:
-    docker:
-      # replace with your preferred image
-      - image: cimg/base:stable
-    steps:
-      - sonarcloud/scan
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -44,7 +34,3 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
-
-  example-workflow:
-    jobs:
-      - code-coverage
